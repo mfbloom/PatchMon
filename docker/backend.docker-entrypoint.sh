@@ -146,12 +146,15 @@ log "Environment: ${NODE_ENV:-production}"
 # Update agents (version-aware)
 update_agents
 
+log "Generating Prisma Client..."
+npx prisma@6 generate --schema ./backend/prisma/schema.prisma
+
 log "Running database migrations..."
-npx prisma migrate deploy
+npx prisma@6 migrate deploy --schema ./backend/prisma/schema.prisma
 
 log "Starting application..."
 if [ "${NODE_ENV}" = "development" ]; then
-    exec npm run dev
+    exec npm run dev:backend
 else
     exec npm start
 fi

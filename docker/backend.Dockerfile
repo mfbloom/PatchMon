@@ -18,9 +18,11 @@ COPY --chown=node:node agents ./agents_backup
 COPY --chown=node:node agents ./agents
 COPY --chmod=755 docker/backend.docker-entrypoint.sh ./entrypoint.sh
 
+RUN chown -R node:node /app/
+
 USER node
 
-RUN npm install --workspace=backend --ignore-scripts && cd backend && npx prisma generate && \
+RUN npm install --workspace=backend --ignore-scripts && cd backend && npx prisma@6 generate && \
     chmod -R u+w /app/node_modules/@prisma/engines 2>/dev/null || true
 
 EXPOSE 3001
@@ -28,7 +30,7 @@ EXPOSE 3001
 VOLUME [ "/app/agents" ]
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=5 \
-  CMD curl -f http://localhost:3001/health || exit 1
+    CMD curl -f http://localhost:3001/health || exit 1
 
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["/app/entrypoint.sh"]
@@ -90,7 +92,7 @@ EXPOSE 3001
 VOLUME [ "/app/agents" ]
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=5 \
-  CMD curl -f http://localhost:3001/health || exit 1
+    CMD curl -f http://localhost:3001/health || exit 1
 
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["/app/entrypoint.sh"]
